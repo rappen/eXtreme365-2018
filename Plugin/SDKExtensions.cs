@@ -11,27 +11,29 @@ using System.Threading.Tasks;
 
 namespace Plugin
 {
-    public static class Extensions
+    public static class SDKExtensions
     {
-        public static Entity GetParent(this Entity entity, JonasPluginBag bag, string lookupattribute, params string[] attributes)
+        #region LocalPluginContext based extensions
+
+        public static Entity GetParent(this Entity entity, LocalPluginContext context, string lookupattribute, params string[] attributes)
         {
             if (!entity.Contains(lookupattribute))
             {
-                bag.Trace($"Missing lookup attribute {lookupattribute}");
+                context.Trace($"Missing lookup attribute {lookupattribute}");
                 return null;
             }
             if (!(entity[lookupattribute] is EntityReference parentref))
             {
-                bag.Trace($"{lookupattribute} is not EntityReference");
+                context.Trace($"{lookupattribute} is not EntityReference");
                 return null;
             }
-            return bag.Service.Retrieve(parentref.LogicalName, parentref.Id, new ColumnSet(attributes));
+            return context.OrganizationService.Retrieve(parentref.LogicalName, parentref.Id, new ColumnSet(attributes));
         }
 
-        public static IEnumerable<Entity> GetChildren(this Entity entity, JonasPluginBag bag, string childname, string lookupattribute, params string[] attributes)
+        public static IEnumerable<Entity> GetChildren(this Entity entity, LocalPluginContext context, string childname, string lookupattribute, params string[] attributes)
         {
             var qx = QueryExpressionFactory.Create(childname, true, new ColumnSet(attributes), false, new object[] { lookupattribute, entity.Id });
-            return bag.Service.RetrieveMultiple(qx).Entities;
+            return context.RetrieveMultiple(qx).Entities;
         }
 
         public static EntityCollection RetrieveMultiple(this LocalPluginContext local, QueryBase query)
@@ -59,6 +61,31 @@ namespace Plugin
             return result;
         }
 
+        #endregion LocalPluginContext based extensions
+
+        #region JonasPluginBag based extensions
+
+        public static Entity GetParent(this Entity entity, JonasPluginBag bag, string lookupattribute, params string[] attributes)
+        {
+            if (!entity.Contains(lookupattribute))
+            {
+                bag.Trace($"Missing lookup attribute {lookupattribute}");
+                return null;
+            }
+            if (!(entity[lookupattribute] is EntityReference parentref))
+            {
+                bag.Trace($"{lookupattribute} is not EntityReference");
+                return null;
+            }
+            return bag.Service.Retrieve(parentref.LogicalName, parentref.Id, new ColumnSet(attributes));
+        }
+
+        public static IEnumerable<Entity> GetChildren(this Entity entity, JonasPluginBag bag, string childname, string lookupattribute, params string[] attributes)
+        {
+            var qx = QueryExpressionFactory.Create(childname, true, new ColumnSet(attributes), false, new object[] { lookupattribute, entity.Id });
+            return bag.Service.RetrieveMultiple(qx).Entities;
+        }
+
         public static Guid Save(this Entity entity, JonasPluginBag bag)
         {
             var result = entity.Id;
@@ -77,6 +104,8 @@ namespace Plugin
             bag.Trace($"Saved record in {sw.ElapsedMilliseconds} ms");
             return result;
         }
+
+        #endregion JonasPluginBag based extensions
 
         public static Entity PostImage(this IPluginExecutionContext context)
         {

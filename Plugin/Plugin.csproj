@@ -83,10 +83,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountPlugin.cs" />
+    <Compile Include="ContactPlugin2.cs" />
     <Compile Include="Const.cs" />
-    <Compile Include="ContactPlugin.cs" />
-    <Compile Include="Extensions.cs" />
+    <Compile Include="ContactPlugin1.cs" />
+    <Compile Include="SDKExtensions.cs" />
     <Compile Include="PluginBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

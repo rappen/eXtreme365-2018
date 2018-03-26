@@ -4,3 +4,4 @@
 
 Plugin.dll
 DLaB.Xrm.2016.dll
+JonasPluginBase.dll
